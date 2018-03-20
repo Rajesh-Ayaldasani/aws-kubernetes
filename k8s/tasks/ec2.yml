@@ -1,0 +1,27 @@
+---
+ - name: creating security group
+   ec2_group:
+    name: K8s_security_group
+    description: creating EC2 group
+    vpc_id: "{{ my_vpc.vpc.id}}"
+    region: "{{aws_region}}"
+    profile: "{{aws_profile}}"
+    rules:
+     - proto: tcp
+       from_port: 22
+       to_port: 22
+       cidr_ip: 0.0.0.0/0
+
+ - name: launching ec2 instance
+   ec2:
+    key_name: k8s-key
+    instance_type: "{{instance_type}}"
+    region: "{{aws_region}}"
+    count: 2 
+    image: "{{aws_ami}}"
+    profile: "{{aws_profile}}"    
+    vpc_subnet_id: "{{public_subnet_id}}"
+    group: K8s_security_group 
+    assign_public_ip: yes
+    wait: yes
+   register: ec2
